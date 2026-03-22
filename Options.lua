@@ -12,7 +12,6 @@ local SETTINGS_DEFAULTS = {
   enableUnleashedWarningSound = true,
   enablePetWarningSound = true,
   enableUPRefreshedSound = true,
-  enableUPCritRefreshSound = true,
 }
 
 local function EnsureSettings()
@@ -97,18 +96,6 @@ local options = {
       end,
       set = function(v)
         SetSetting("enableUPRefreshedSound", v)
-      end,
-    },
-    enableUPCritRefreshSound = {
-      type = "toggle",
-      name = L["Unleashed Potential Crit Refresh Sound"],
-      desc = L["Play sound when Unleashed Potential refreshes from a crit"],
-      order = 5,
-      get = function()
-        return GetSetting("enableUPCritRefreshSound")
-      end,
-      set = function(v)
-        SetSetting("enableUPCritRefreshSound", v)
       end,
     },
   },

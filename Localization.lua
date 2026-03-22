@@ -18,7 +18,5 @@ L:RegisterTranslations("enUS", function()
     ["Unleashed Potential Health Funnel Refresh Sound"] = true,
     ["Play sound when Health Funnel refreshes the Unleashed Potential timer"] = true,
 
-    ["Unleashed Potential Crit Refresh Sound"] = true,
-    ["Play sound when Unleashed Potential refreshes from a crit"] = true,
   }
 end)

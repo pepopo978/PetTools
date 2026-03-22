@@ -18,7 +18,6 @@ PetToolsData = {
     enableUnleashedWarningSound = true,
     enablePetWarningSound = true,
     enableUPRefreshedSound = true,
-    enableUPCritRefreshSound = true,
   },
 }
 
@@ -60,6 +59,52 @@ local HEALTH_FUNNEL_SPELLS = {
   [11695] = true,
 }
 
+local SpellIdThatRefreshUnleashed = {
+  [348] = true, -- Immolate Rank 1
+  [707] = true, -- Immolate Rank 2
+  [1094] = true, -- Immolate Rank 3
+  [2941] = true, -- Immolate Rank 4
+  [11665] = true, -- Immolate Rank 5
+  [11667] = true, -- Immolate Rank 6
+  [11668] = true, -- Immolate Rank 7
+  [25309] = true, -- Immolate Rank 8
+
+  [5740] = true, -- Rain of Fire Rank 1
+  [6219] = true, -- Rain of Fire Rank 2
+  [11677] = true, -- Rain of Fire Rank 3
+  [11678] = true, -- Rain of Fire Rank 4
+
+  [5676] = true, -- Searing Pain Rank 1
+  [17919] = true, -- Searing Pain Rank 2
+  [17920] = true, -- Searing Pain Rank 3
+  [17921] = true, -- Searing Pain Rank 4
+  [17922] = true, -- Searing Pain Rank 5
+  [17923] = true, -- Searing Pain Rank 6
+
+  [686] = true, -- Shadow Bolt Rank 1
+  [695] = true, -- Shadow Bolt Rank 2
+  [705] = true, -- Shadow Bolt Rank 3
+  [1088] = true, -- Shadow Bolt Rank 4
+  [1106] = true, -- Shadow Bolt Rank 5
+  [7641] = true, -- Shadow Bolt Rank 6
+  [11659] = true, -- Shadow Bolt Rank 7
+  [11660] = true, -- Shadow Bolt Rank 8
+  [11661] = true, -- Shadow Bolt Rank 9
+  [25307] = true, -- Shadow Bolt Rank 10
+
+  [17877] = true, -- Shadowburn Rank 1
+  [17877] = true, -- Shadowburn Rank 2
+  [17877] = true, -- Shadowburn Rank 3
+  [17877] = true, -- Shadowburn Rank 4
+  [17877] = true, -- Shadowburn Rank 5
+  [17877] = true, -- Shadowburn Rank 6
+
+  [6353] = true, -- Soul Fire Rank 1
+  [17924] = true, -- Soul Fire Rank 2
+  [51683] = true, -- Soul Fire Rank 3
+  [51684] = true, -- Soul Fire Rank 4
+}
+
 local POWER_OVERWHELMING = 51714
 
 PetToolsData.SPELL_DURATIONS = {}
@@ -67,13 +112,11 @@ local SPELL_DURATION_IDS = { 51714, 51718, 51719, 51720 }
 
 local REFRESH_FUNNEL_EVENT = "PetTools_RefreshFunnel"
 local FUNNEL_RESET_SOUND_PATH = "Interface\\AddOns\\PetTools\\ding.mp3"
-local CRIT_REFRESH_MIN_STACKS = 3
-local SPELL_HIT_TYPE_CRIT = 2
+local REFRESH_MIN_STACKS = 3
 local SETTINGS_DEFAULTS = {
   enableUnleashedWarningSound = true,
   enablePetWarningSound = true,
   enableUPRefreshedSound = true,
-  enableUPCritRefreshSound = true,
 }
 
 local function InitializeSettings()
@@ -144,8 +187,12 @@ local function RefreshFunnel()
   end
 end
 
-local function RefreshUnleashedOnCrit(hitInfo)
-  if PetToolsData.warlock.unleashedPotentialStacks < CRIT_REFRESH_MIN_STACKS then
+local function RefreshUnleashedOnSpellHit(spellId)
+  if PetToolsData.warlock.unleashedPotentialStacks < REFRESH_MIN_STACKS then
+    return
+  end
+
+  if not SpellIdThatRefreshUnleashed[spellId] then
     return
   end
 
@@ -153,14 +200,6 @@ local function RefreshUnleashedOnCrit(hitInfo)
     return
   end
 
-  local isCrit = bit.band(hitInfo or 0, SPELL_HIT_TYPE_CRIT) ~= 0
-  if not isCrit then
-    return
-  end
-
-  if PetToolsData.settings.enableUPCritRefreshSound then
-    PlaySoundFile(FUNNEL_RESET_SOUND_PATH)
-  end
   PetToolsData.warlock.unleashedPotentialStartTime = GetTime()
 end
 
@@ -291,7 +330,7 @@ PetToolsEvents:RegisterEvent("SPELL_FAILED_SELF", function(spellId, spellResult,
 end)
 
 PetToolsEvents:RegisterEvent("SPELL_DAMAGE_EVENT_SELF", function(targetGuid, casterGuid, spellId, amount, mitigationStr, hitInfo, spellSchool, effectAuraStr)
-  RefreshUnleashedOnCrit(hitInfo)
+  RefreshUnleashedOnSpellHit(spellId)
 end)
 
 PetToolsEvents:RegisterEvent("UNIT_DIED", function(guid)
