@@ -244,6 +244,8 @@ local function SyncPetFromUnit()
 end
 
 PetToolsEvents:RegisterEvent("PLAYER_ENTERING_WORLD", function()
+	SetCVar("NP_EnableSpellGoEvents", 1)
+
   for _, spellId in ipairs(SPELL_DURATION_IDS) do
     PetToolsData.SPELL_DURATIONS[spellId] = GetSpellDuration(spellId)
   end
